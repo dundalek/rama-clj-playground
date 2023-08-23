@@ -24,5 +24,4 @@
       (.append depot "Hello, world!!"))))
 
 (comment
-  ;; Does not seem to work in REPL, getting `Failed to generate constants class` exception
   (-main))
