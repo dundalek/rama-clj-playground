@@ -1,6 +1,6 @@
 (ns rama-playground.rama-helpers
   (:import
-   (com.rpl.rama CompoundAgg Path)
+   (com.rpl.rama Block CompoundAgg Path)
    (com.rpl.rama.ops RamaFunction0 RamaFunction1)))
 
 (defn function0 [f]
@@ -21,8 +21,21 @@
 (defn out [block-out & vars]
   (.out block-out (into-array String vars)))
 
+(defn extract-map-fields [from & field-vars]
+  (reduce
+   (fn [ret field]
+      ;; Implemented for keywords for now, but strings might make sense too.
+     (assert (keyword? field) (str "Expected keyword, got: " field))
+     (-> ret
+         (each field from)
+         (out (str "*" (name field)))))
+   (Block/create)
+   field-vars))
+
 (defn compound-agg-map [& args]
   (CompoundAgg/map (to-array args)))
 
 (defn path-key [& arg-keys]
   (Path/key (into-array String arg-keys)))
+
+

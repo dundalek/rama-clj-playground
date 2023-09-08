@@ -15,11 +15,7 @@
 
     (-> (.source users "*userRegistrationsDepot")
         (rh/out "*registration")
-        ;; TODO: try macro ala extractJavaFields
-        (rh/each :userId "*registration")
-        (rh/out "*userId")
-        (rh/each :displayName "*registration")
-        (rh/out "*displayName")
+        (.macro (rh/extract-map-fields "*registration" :userId :displayName))
         (rh/each #(System/currentTimeMillis))
         (rh/out "*joinedAtMillis")
         (.localTransform "$$profiles"
@@ -32,13 +28,7 @@
 
     (-> (.source users "*profileEditsDepot")
         (rh/out "*edit")
-        ;; TODO: try macro ala extractJavaFields
-        (rh/each :userId "*edit")
-        (rh/out "*userId")
-        (rh/each :field "*edit")
-        (rh/out "*field")
-        (rh/each :value "*edit")
-        (rh/out "*value")
+        (.macro (rh/extract-map-fields "*edit" :userId :field :value))
         (.localTransform "$$profiles" (-> (rh/path-key "*userId" "*field") (.termVal "*value"))))))
 
 (deftype UserIdExtractor []
