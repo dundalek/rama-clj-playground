@@ -2,7 +2,7 @@
   (:require
    [rama-playground.rama-helpers :as rh])
   (:import
-   (com.rpl.rama Agg CompoundAgg Depot Path PState RamaModule)
+   (com.rpl.rama Agg Depot Path PState RamaModule)
    (com.rpl.rama.test InProcessCluster LaunchConfig)))
 
 ;; Based on https://github.com/redplanetlabs/rama-examples/blob/master/src/main/java/rama/examples/tutorial/PageAnalyticsModule.java
@@ -23,8 +23,8 @@
           (rh/out "*sessionId")
           (.each (rh/function1 :path) "*pageVisit")
           (rh/out "*path")
-          (.compoundAgg "$$pageViewCount" (CompoundAgg/map (to-array ["*path" (Agg/count)])))
-          (.compoundAgg "$$sessionHistory" (CompoundAgg/map (to-array ["*sessionId" (Agg/list "*pageVisit")])))))))
+          (.compoundAgg "$$pageViewCount" (rh/compound-agg-map "*path" (Agg/count)))
+          (.compoundAgg "$$sessionHistory" (rh/compound-agg-map "*sessionId" (Agg/list "*pageVisit")))))))
 
 (defn -main []
   (with-open [cluster (InProcessCluster/create)]
