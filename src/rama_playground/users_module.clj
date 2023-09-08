@@ -2,7 +2,7 @@
   (:require
    [rama-playground.rama-helpers :as rh])
   (:import
-   (com.rpl.rama Agg Depot Path PState RamaModule)
+   (com.rpl.rama Depot Path PState RamaModule)
    (com.rpl.rama.ops Ops RamaFunction1)
    (com.rpl.rama.test InProcessCluster LaunchConfig)))
 
@@ -16,11 +16,11 @@
     (-> (.source users "*userRegistrationsDepot")
         (rh/out "*registration")
         ;; TODO: try macro ala extractJavaFields
-        (.each (rh/function1 :user-id) "*registration")
+        (rh/each :userId "*registration")
         (rh/out "*userId")
-        (.each (rh/function1 :display-name) "*registration")
+        (rh/each :displayName "*registration")
         (rh/out "*displayName")
-        (.each (rh/function0 #(System/currentTimeMillis)))
+        (rh/each #(System/currentTimeMillis))
         (rh/out "*joinedAtMillis")
         (.localTransform "$$profiles"
                          (-> (rh/path-key "*userId")
@@ -33,18 +33,18 @@
     (-> (.source users "*profileEditsDepot")
         (rh/out "*edit")
         ;; TODO: try macro ala extractJavaFields
-        (.each (rh/function1 :user-id) "*edit")
+        (rh/each :userId "*edit")
         (rh/out "*userId")
-        (.each (rh/function1 :field) "*edit")
+        (rh/each :field "*edit")
         (rh/out "*field")
-        (.each (rh/function1 :value) "*edit")
+        (rh/each :value "*edit")
         (rh/out "*value")
         (.localTransform "$$profiles" (-> (rh/path-key "*userId" "*field") (.termVal "*value"))))))
 
 (deftype UserIdExtractor []
   RamaFunction1
   (invoke [_ data]
-    (:user-id data)))
+    (:userId data)))
 
 (deftype UsersModule []
   RamaModule
@@ -62,9 +62,9 @@
           profileEditsDepot (.clusterDepot cluster module-name "*profileEditsDepot")
           profiles (.clusterPState cluster module-name "$$profiles")
           append-user-registration (fn [user-id display-name]
-                                     (.append userRegistrationsDepot {:user-id user-id :display-name display-name}))
+                                     (.append userRegistrationsDepot {:userId user-id :displayName display-name}))
           append-profile-edit (fn [user-id field value]
-                                (.append profileEditsDepot {:user-id user-id :field field :value value}))]
+                                (.append profileEditsDepot {:userId user-id :field field :value value}))]
 
       (append-user-registration "alice" "Alice")
       (append-user-registration "alice" "Alice2")

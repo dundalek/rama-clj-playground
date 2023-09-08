@@ -11,6 +11,13 @@
   (reify RamaFunction1
     (invoke [_ arg0] (f arg0))))
 
+(defn each
+  ([block op]
+   (.each block (function0 op)))
+  ([block op arg0]
+   (.each block (function1 op) arg0)))
+  ;; TODO: add more variants
+
 (defn out [block-out & vars]
   (.out block-out (into-array String vars)))
 
